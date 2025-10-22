@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vapeo: info + animaciones al límite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <style>
+    :root{
+      --bg:#f2f4f8;
+      --card:rgba(255,255,255,.65);
+      --text:#1d1d1f;
+      --accent:#ff4d4d;
+      --shadow:rgba(0,0,0,.08);
+    }
+    [data-theme="dark"]{
+      --bg:#0f0f0f;
+      --card:rgba(20,20,20,.65);
+      --text:#f2f2f2;
+      --shadow:rgba(255,255,255,.05);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif;}
+    body{background:var(--bg);color:var(--text);transition:background .3s;overflow-x:hidden;font-size:1.25rem;line-height:1.6;}
+    #particles{position:fixed;width:100%;height:100%;top:0;left:0;z-index:-1;}
+    .particle{position:absolute;border-radius:50%;opacity:.35;animation:float 25s infinite linear;}
+    @keyframes float{0%{transform:translateY(100vh) scale(1);}100%{transform:translateY(-100vh) scale(1.5);}}
+    header{
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:20px;
+      position:relative;
+      background:url('https://images.unsplash.com/photo-1588720436981-67178345ff41?ixlib=rb-4.0&auto=format&fit=crop&w=1470&q=80') center/cover fixed;
+    }
+    header::before{
+      content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent),#ff8c8c);opacity:.82;
+    }
+    header h1,header p,header .btn{position:relative;color:#fff;z-index:2;}
+    header h1{font-size:clamp(3rem,7vw,6rem);margin-bottom:1rem;letter-spacing:-2px;}
+    .typewriter{display:inline-block;overflow:hidden;white-space:nowrap;border-right:4px solid #fff;animation:typing 3s steps(35,end),blink .75s step-end infinite;}
+    @keyframes typing{from{width:0}to{width:100%}}
+    @keyframes blink{from,to{border-color:transparent}50%{border-color:#fff}}
+    .btn{
+      margin-top:2rem;
+      padding:.9rem 2.2rem;
+      background:#fff;
+      color:var(--accent);
+      border:none;border-radius:30px;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .3s;
+    }
+    .btn:hover{transform:scale(1.05);}
+    nav{
+      position:sticky;top:0;
+      backdrop-filter:blur(10px);
+      background:var(--card);
+      box-shadow:0 2px 8px var(--shadow);
+      display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;
+      padding:1rem;
+      z-index:10;
+    }
+    nav a{color:var(--text);text-decoration:none;font-weight:500;padding:.5rem 1rem;border-radius:20px;transition:.3s;font-size:1.1rem;}
+    nav a:hover{background:var(--accent);color:#fff;}
+    main{max-width:1100px;margin:auto;padding:3rem 1rem;}
+    section{margin-bottom:6rem;opacity:0;transform:translateY(50px);transition:all .8s;}
+    section.visible{opacity:1;transform:translateY(0);}
+    h2{display:flex;align-items:center;gap:.5rem;font-size:2.4rem;margin-bottom:2rem;}
+    .grid{display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
+    .card{
+      background:var(--card);
+      border-radius:20px;
+      padding:2rem;
+      backdrop-filter:blur(12px);
+      box-shadow:0 10px 40px var(--shadow);
+      transform-style:preserve-3d;
+      transition:transform .4s;
+    }
+    .card:hover{transform:rotateX(7deg) rotateY(-7deg) scale(1.04);}
+    .counter-val{font-size:3.5rem;font-weight:900;color:var(--accent);}
+    .circle-wrap{margin:2rem auto;width:200px;height:200px;border-radius:50%;background:conic-gradient(var(--accent) 0deg 126deg,#ddd 126deg 360deg);display:flex;align-items:center;justify-content:center;position:relative;}
+    .circle-wrap::before{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:var(--bg);}
+    .circle-text{position:relative;font-size:2rem;font-weight:700;}
+    .glosario-item{margin-bottom:1rem;padding:1rem;border-left:4px solid var(--accent);background:var(--card);border-radius:0 8px 8px 0;cursor:pointer;transition:.3s;font-size:1.1rem;}
+    .glosario-item:hover{transform:translateX(5px);}
+    ul li{margin-bottom:.5rem;font-size:1.1rem;}
+    p{font-size:1.1rem;}
+    footer{text-align:center;padding:2rem;font-size:.9rem;color:#777;}
+
+    /* --- GALERÍA DE IMÁGENES --- */
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+    .gallery-item img{width:100%;height:150px;object-fit:cover;border-radius:12px;cursor:pointer;transition:transform .3s,box-shadow .3s;}
+    .gallery-item img:hover{transform:scale(1.05);box-shadow:0 8px 24px var(--shadow);}
+    /* Modal */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;}
+    .modal img{max-width:90%;max-height:80%;border-radius:12px;}
+    .modal-close{position:absolute;top:20px;right:30px;color:#fff;font-size:2rem;cursor:pointer;}
+	.video-wrap{
+  position:relative;
+  padding-bottom:56.25%; /* 16:9 */
+  height:0;
+  overflow:hidden;
+  max-width:100%;
+  border-radius:16px;
+}
+.video-wrap iframe{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+}
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<header>
+  <h1><span class="typewriter">Explorando los<br>efectos del vapeo</span></h1>
+  <p>Historia, componentes, causas, riesgos y consecuencias del vapeo</p>
+  <button class="btn" onclick="document.querySelector('main').scrollIntoView({behavior:'smooth'})">Explora ↓</button>
+</header>
+
+<nav>
+  <a href="#historia">Historia</a>
+  <a href="#componentes">Componentes</a>
+  <a href="#causas">Causas</a>
+  <a href="#riesgos">Riesgos</a>
+  <a href="#consecuencias">Consecuencias</a>
+  <a href="#comparativa">Comparativa</a>
+  <a href="#imagenes">Imágenes</a>
+  <a href="#glosario">Glosario</a>
+  <button id="themeToggle" style="margin-left:auto;background:none;border:none;font-size:1.5rem;cursor:pointer;">🌓</button>
+</nav>
+
+<main>
+  <!-- HISTORIA -->
+  <section id="historia">
+    <h2><lottie-player src="https://assets2.lottiefiles.com/packages/lf20_jlmgvacm.json" background="transparent" speed="1" loop autoplay></lottie-player>Historia</h2>
+    <div class="card">
+      <ul>
+        <li><strong>2003 – China:</strong> Hon Lik crea el primer cigarrillo electrónico tras perder a su padre por cáncer de pulmón.</li>
+        <li><strong>2006-08:</strong> Llegada a Europa y EE. UU. como dispositivo médico para dejar de fumar.</li>
+        <li><strong>2015:</strong> Juul lanza pods con 50 mg/ml de nic-sal.</li>
+        <li><strong>2019:</strong> La FDA declara “epidemia” el consumo juvenil.</li>
+        <li><strong>2021-25:</strong> Prohibición de sabores en algunos países, pero florece el mercado negro y los “puffs” desechables.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- COMPONENTES -->
+  <section id="componentes">
+    <h2><lottie-player src="https://assets9.lottiefiles.com/packages/lf20_w51pcehl.json" background="transparent" speed="1" loop autoplay></lottie-player>Componentes del líquido</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="counter-val" data-target="50">0</div>
+        <p>mg/ml de nicotina en un pod Juul (≈ 25 cigarrillos)</p>
+      </div>
+      <div class="card">
+        <h4>Glicol & Glicerina</h4>
+        <p>Forman el aerosol. A >250 °C producen formaldehído y acroleína.</p>
+      </div>
+      <div class="card">
+        <h4>Sabores</h4>
+        <p>Diacetilo (mantequilla) → bronquiolitis obliterante; benzaldehído (cereza) → irritación pulmonar.</p>
+      </div>
+      <div class="card">
+        <h4>Metales pesados</h4>
+        <p>Níquel, cromo, plomo, cadmio: se desprenden de la resistencia y se inhalan como nanopartículas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAUSAS -->
+  <section id="causas">
+    <h2><lottie-player src="https://assets4.lottiefiles.com/packages/lf20_u8o7BL.json" background="transparent" speed="1" loop autoplay></lottie-player>Causas del consumo</h2>
+    <div class="card">
+      <ol>
+        <li><strong>Marketing 360°:</strong> TikTok, Twitch, influencers pagados, sabores “gummy bear”. El gasto en publicidad Juul creció 700 % en 2015-18.</li>
+        <li><strong>Precio bajo:</strong> 8-12 € por puff desechable.</li>
+        <li><strong>Falta de percepción de riesgo:</strong> 67 % de adolescentes cree que “solo es vapor de agua” (CDC 2022).</li>
+        <li><strong>Presión de grupo:</strong> 60 % lo prueba “para encajar en el colegio”.</li>
+        <li><strong>Ventas online sin verificación:</strong> 80 % de webs no solicita DNI real (estudio OMS 2023).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- RIESGOS -->
+  <section id="riesgos">
+    <h2><lottie-player src="https://assets1.lottiefiles.com/packages/lf20_kqfwzxix.json" background="transparent" speed="1" loop autoplay></lottie-player>Riesgos documentados</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="counter-val" data-target="7">0</div>
+        <p>días de uso diario para desarrollar adicción a la nicotina</p>
+      </div>
+      <div class="card">
+        <div class="counter-val" data-target="30">0</div>
+        <p>% más riesgo de infarto en jóvenes usuarios frecuentes (UCSF 2021)</p>
+      </div>
+      <div class="card">
+        <h4>EVALI</h4>
+        <p>2 807 hospitalizaciones y 68 muertes en EE. UU. (2019-2020).</p>
+      </div>
+      <div class="card">
+        <h4>Gateway effect</h4>
+        <p>4× más probabilidades de fumar cigarrillos clásicos al año.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONSECUENCIAS -->
+  <section id="consecuencias">
+    <h2><lottie-player src="https://assets10.lottiefiles.com/packages/lf20_1a8dx7zj.json" background="transparent" speed="1" loop autoplay></lottie-player>Consecuencias en jóvenes</h2>
+    <div class="grid">
+      <div class="card">
+        <h4>Salud física</h4>
+        <ul>
+          <li>Disminución 3-5 % capacidad pulmonar en 6 meses</li>
+          <li>Tos crónica y fatiga</li>
+          <li>Daño renal por metales pesados</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Salud mental</h4>
+        <ul>
+          <li>Aumento 2× ansiedad/depresión (JAMA 2021)</li>
+          <li>Irritabilidad y síntomas de abstinencia</li>
+          <li>Peor rendimiento académico (sueño fragmentado)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Salud social</h4>
+        <ul>
+          <li>Aislamiento de grupos que no consumen</li>
+          <li>Gasto promedio 60-90 €/mes</li>
+          <li>Sanciones escolares y multas</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARATIVA -->
+  <section id="comparativa">
+    <h2><lottie-player src="https://assets3.lottiefiles.com/packages/lf20_4kx2q32n.json" background="transparent" speed="1" loop autoplay></lottie-player>Comparativa: cigarrillo vs vapeo</h2>
+    <div class="grid">
+      <div class="card"><h4>Nicotina</h4><p><strong>Cigarrillo:</strong> 1-2 mg por unidad<br><strong>Pod 50 mg:</strong> 25 cigarrillos</p></div>
+      <div class="card"><h4>Tóxicos únicos</h4><p><strong>Cigarrillo:</strong> alquitrán, CO<br><strong>Vapeo:</strong> aldehídos, metales, diacetilo</p></div>
+      <div class="card"><h4>Adicción</h4><p><strong>Cigarrillo:</strong> 1-2 meses<br><strong>Vapeo:</strong> 7-10 días (nic-sal)</p></div>
+      <div class="card">
+        <h4>¿Cuánto vapeas?</h4>
+        <div class="circle-wrap"><div class="circle-text">126°</div></div>
+        <p style="text-align:center;">Un pod = 20 cigarrillos en nicotina</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMÁGENES -->
+  <section id="imagenes">
+    <h2><lottie-player src="https://assets8.lottiefiles.com/packages/lf20_wl6jvgsx.json" background="transparent" speed="1" loop autoplay></lottie-player>Imágenes</h2>
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Aquí se cargarán las imágenes automáticamente -->
+    </div>
+    <br>
+ 
+      <!-- Sección Vídeo -->
+<section id="video">
+  <h2><lottie-player src="https://assets2.lottiefiles.com/packages/lf20_jlmgvacm.json" background="transparent" speed="1" loop autoplay></lottie-player>Vídeo</h2>
+  <div class="video-wrap">
+    <iframe 
+      src="https://www.youtube-nocookie.com/embed/DKp_JJ9oP5s" 
+      title="YouTube video player" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+      allowfullscreen>
+    </iframe>
+	
+	
+
+<script>
+document.getElementById('reloadVideo').addEventListener('click', () => {
+  const iframe = document.querySelector('#video iframe');
+  if (iframe) iframe.src = iframe.src;
+});
+</script>
+  </div>
+</section>
+  
+      </div>
+    </details>
+  </section>
+
+  <!-- GLOSARIO -->
+  <section id="glosario">
+    <h2><lottie-player src="https://assets7.lottiefiles.com/packages/lf20_5tl1xxnz.json" background="transparent" speed="1" loop autoplay></lottie-player>Glosario interactivo</h2>
+    <div class="card glosario">
+      <div class="glosario-item" onclick="alert('Nic-Sal: nicotina de rápida absorción que reduce el golpe en garganta pero potencia la adicción.')">Nic-Sal</div>
+      <div class="glosario-item" onclick="alert('Pod: cápsula desechable con 0,7-2 ml de líquido y resistencia integrada.')">Pod</div>
+      <div class="glosario-item" onclick="alert('EVALI: E-cigarette or Vaping product use Associated Lung Injury.')">EVALI</div>
+      <div class="glosario-item" onclick="alert('Tricks: arte de hacer anillos o nubes; aumenta consumo por grandes bocanadas.')">Tricks</div>
+      <div class="glosario-item" onclick="alert('Puff: cigarrillo electrónico desechable de 600 caladas.')">Puff</div>
+    </div>
+  </section>
+</main>
+
+
+
+
+<!-- Modal para imágenes -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+  <span class="modal-close">&times;</span>
+  <img id="modalImg" src="" alt="Imagen ampliada">
+</div>
+
+<script>
+  /* Partículas con canvas */
+  const canvas=document.getElementById('particles');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const particles=[];
+  for(let i=0;i<70;i++){
+    particles.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*4,
+      dy:Math.random()*.8+.5,
+      color:'rgba(255,77,77,0.35)'
+    });
+  }
+  function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.y+=p.dy;
+      if(p.y>canvas.height)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color;
+      ctx.fill();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+  window.addEventListener('resize',()=>{
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+  });
+
+  /* Scroll reveal */
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+  },{threshold:.2});
+  document.querySelectorAll('section').forEach(s=>obs.observe(s));
+
+  /* Tema */
+  const btn=document.getElementById('themeToggle');
+  btn.onclick=()=>{
+    document.documentElement.toggleAttribute('data-theme','dark');
+    localStorage.setItem('tema',document.documentElement.hasAttribute('data-theme')?'dark':'light');
+  };
+  if(localStorage.getItem('tema')==='dark')document.documentElement.setAttribute('data-theme','dark');
+
+  /* Counters animados */
+  const counters=document.querySelectorAll('.counter-val');
+  const speed=200;
+  const animateCounter=el=>{
+    const target=+el.getAttribute('data-target');
+    const count=+el.innerText;
+    const inc=target/speed;
+    if(count<target){
+      el.innerText=Math.ceil(count+inc);
+      setTimeout(()=>animateCounter(el),25);
+    }else{
+      el.innerText=target+(target>30?'+':'');
+    }
+  };
+  const counterObs=new IntersectionObserver((e,o)=>{
+    e.forEach(entry=>{
+      if(entry.isIntersecting){
+        animateCounter(entry.target);
+        o.unobserve(entry.target);
+      }
+    });
+  },{threshold:.7});
+  counters.forEach(c=>counterObs.observe(c));
+
+  /* Galería modal */
+  const modal=document.getElementById('imageModal');
+  const modalImg=document.getElementById('modalImg');
+  function openModal(src){
+    modal.style.display='flex';
+    modalImg.src=src;
+  }
+  function closeModal(){
+    modal.style.display='none';
+  }
+
+  /* Cargar imágenes automáticamente */
+  // Opción 1: carpeta local img/ (renombra tus fotos 1.jpg, 2.jpg, 3.jpg...)
+  const localImages=['img/1.jpg','img/2.jpg','img/3.jpg','img/4.jpg'];
+  // Opción 2: URLs externas (sustituye por tus enlaces directos)
+  const customImages=[
+    'https://i.postimg.cc/c4MfwpgP/ddd.jpg',
+    'https://i.postimg.cc/HkzKZvKw/Whats-App-Image-2025-07-29-at-7-27-10-PM.jpg',
+    'https://i.postimg.cc/gkqBjBYb/Whats-App-Image-2025-07-29-at-7-27-11-PM.jpg'
+  ];
+  // Usa el array que prefieras:
+  const imagesToShow=customImages; // ← cambia a customImages si usas URLs externas
+
+  const galleryGrid=document.getElementById('galleryGrid');
+  imagesToShow.forEach(src=>{
+    const item=document.createElement('div');
+    item.className='gallery-item';
+    const img=document.createElement('img');
+    img.src=src;
+    img.alt='Imagen sobre vapeo';
+    img.onclick=()=>openModal(src);
+    item.appendChild(img);
+    galleryGrid.appendChild(item);
+  });
+</script>
+
+</body>
+</html>
